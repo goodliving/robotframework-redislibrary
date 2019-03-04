@@ -12,21 +12,22 @@ __version__ = VERSION
 class RedisLibraryKeywords(object):
 
     @keyword('Connect To Redis')
-    def connect_to_redis(self, redis_host, redis_port=6379, db=0): # pragma: no cover
+    def connect_to_redis(self, redis_host, redis_port=6379, db=0, passwd=""): # pragma: no cover
         """Connect to the Redis server.
 
         Arguments:
             - redis_host: hostname or IP address of the Redis server.
             - redis_port: Redis port number (default=6379)
             - db: Redis keyspace number (default=0)
+            - passwd: Redis password (default=0)
 
         Return redis connection object
 
         Examples:
-        | ${redis_conn}=   | Connect To Redis |  redis-dev.com | 6379 |
+        | ${redis_conn}=   | Connect To Redis |  redis-dev.com | 6379 | passwd |
         """
         try:
-            redis_conn = redis.StrictRedis(host=redis_host, port=redis_port, db=db)
+            redis_conn = redis.StrictRedis(host=redis_host, port=redis_port, db=db, password=passwd)
         except Exception as ex:
             logger.error(str(ex))
             raise Exception(str(ex))
@@ -254,19 +255,4 @@ class RedisLibraryKeywords(object):
         """
         if redis_conn.hexists(hash_name, key) is True:
             logger.error("Hash: " + hash_name + " and Key: " + key +" exist in Redis.")
-            raise AssertionError
-
-    @keyword('Redis Key Should Not Be Exist')
-    def check_if_key_not_exists(self, redis_conn, key):
-        """ Keyword will successed if specify key doesn't exist in Redis
-
-        Arguments:
-            - redis_conn: Redis connection object
-            - key: String keyword to find.
-
-        Examples:
-        | ${not_exist}= | Redis Key Should Not Be Exist | ${redis_conn} | BARCODE|1234567890 |
-        """
-        if redis_conn.exists(key):
-            logger.error("Key " + key + " exist in Redis.")
             raise AssertionError
